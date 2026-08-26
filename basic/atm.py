@@ -22,4 +22,3 @@ while balance >= 0:
             balance -= withdraw
     elif a == 4:
         break
-    
