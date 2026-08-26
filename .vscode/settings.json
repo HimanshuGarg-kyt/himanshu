@@ -1,0 +1,10 @@
+{
+    "python-envs.pythonProjects": [
+        {
+            "path": "basic/1.py",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ],
+    "C_Cpp.default.compilerPath": "C:/MinGW/bin/g++.exe"
+}
