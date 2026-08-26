@@ -1,4 +1,2 @@
-a = input()
-b= a.split()
-print(len(b))
-print(b)
+a = " "
+print(a.isspace())
