@@ -1,6 +1,7 @@
-def length(b):
-    a = len(b)
-    return(a)
-
-list = [1,96,9654,]
-print(length(list))
+def even_or_odd(number):
+    if number%2==0:
+        print("EVEN")
+    else:
+        print("ODD")
+n = int(input("enter a number : "))
+even_or_odd(n)
