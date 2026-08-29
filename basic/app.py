@@ -2,40 +2,152 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-# --- Load dataset ---
-df = pd.read_csv("diabetes_risk_prediction_dataset-selected-columns.csv")
+st.title("Interactive Metabolic Risk Dashboard & Calculator")
 
-# --- Tables ---
-tier_counts = df["Risk_Tier"].value_counts().reset_index()
-tier_counts.columns = ["Risk_Tier", "Count"]
+# --- File Upload ---
+uploaded_file = st.file_uploader("Upload your dataset (CSV)", type="csv")
 
-st.subheader("BMI Risk Tier Distribution (Pie Chart)")
-fig_pie = px.pie(tier_counts, names="Risk_Tier", values="Count",
-                 title="Percentage of Population in Each Risk Tier")
-st.plotly_chart(fig_pie)
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
 
-st.subheader("BMI Spread by Risk Tier (Box Plot)")
-fig_box = px.box(df, x="Risk_Tier", y="BMI", color="Risk_Tier",
-                 title="BMI Distribution Across Risk Tiers",
-                 points="all")  # shows outliers
-st.plotly_chart(fig_box)
+    # --- Data Preprocessing ---
+    for col in ["Height_cm", "Weight_kg", "Blood_Glucose", "HbA1c"]:
+        df[col] = df[col].fillna(df[col].median())
 
-st.subheader("Obesity Categories by Country")
+    # --- Feature Engineering ---
+    df["BMI"] = df["Weight_kg"] / ((df["Height_cm"]/100) ** 2)
 
-# Categorize BMI
-def bmi_category(bmi):
-    if bmi < 25:
-        return "Normal"
-    elif bmi < 30:
-        return "Increased Risk"
-    else:
-        return "High Risk"
+    # --- Risk Tier Segmentation ---
+    def assign_tier(row):
+        if row["HbA1c"] >= 6.5 or row["Blood_Glucose"] >= 140 or row["BMI"] >= 30:
+            return "High Risk"
+        elif (row["HbA1c"] >= 5.7 or row["Blood_Glucose"] >= 100 or row["BMI"] >= 25):
+            return "Moderate Risk"
+        else:
+            return "Low Risk"
 
-df["BMI_Category"] = df["BMI"].apply(bmi_category)
+    df["Risk_Tier"] = df.apply(assign_tier, axis=1)
 
-# Group by Country + BMI Category
-country_counts = df.groupby(["Country", "BMI_Category"]).size().reset_index(name="Count")
+    # --- Tables ---
+    tier_counts = df["Risk_Tier"].value_counts().reset_index()
+    tier_counts.columns = ["Risk_Tier", "Count"]
 
-fig_obesity = px.bar(country_counts, x="Country", y="Count", color="BMI_Category",
-                     barmode="group", title="Obesity Categories by Country")
-st.plotly_chart(fig_obesity)
+    avg_age = df.groupby("Risk_Tier")["Age"].mean().reset_index()
+    avg_age.columns = ["Risk_Tier", "Average_Age"]
+
+    # --- Sidebar Navigation ---
+    section = st.sidebar.radio("Choose Section", ["Global Dashboard", "Personal Calculator"])
+
+    # --- Section 1: Global Dashboard ---
+    if section == "Global Dashboard":
+        st.header("📊 Global Population Dashboard")
+
+        # Tier Distribution
+        st.subheader("Tier Distribution Table")
+        st.table(tier_counts)
+
+        st.subheader("Tier Distribution Chart")
+        fig1 = px.bar(tier_counts, x="Risk_Tier", y="Count", color="Risk_Tier",
+                      title="Tier Distribution")
+        st.plotly_chart(fig1)
+
+        # Average Age
+        st.subheader("Average Age per Tier")
+        st.table(avg_age)
+
+        fig2 = px.bar(avg_age, x="Risk_Tier", y="Average_Age", color="Risk_Tier",
+                      title="Average Age per Tier")
+        st.plotly_chart(fig2)
+
+        # Blood Glucose Distribution
+        st.subheader("Blood Glucose Distribution by Tier")
+        fig3 = px.box(df, x="Risk_Tier", y="Blood_Glucose", color="Risk_Tier",
+                      title="Blood Glucose Distribution")
+        st.plotly_chart(fig3)
+
+        # BMI Distribution
+        st.subheader("BMI Distribution by Tier")
+        fig4 = px.box(df, x="Risk_Tier", y="BMI", color="Risk_Tier",
+                      title="BMI Distribution")
+        st.plotly_chart(fig4)
+
+        # --- New Visualizations ---
+        # Pie Chart
+        st.subheader("BMI Risk Tier Distribution (Pie Chart)")
+        fig_pie = px.pie(tier_counts, names="Risk_Tier", values="Count",
+                         title="Percentage of Population in Each Risk Tier")
+        st.plotly_chart(fig_pie)
+
+        # Box Plot with Outliers
+        st.subheader("BMI Spread by Risk Tier (Box Plot)")
+        fig_box = px.box(df, x="Risk_Tier", y="BMI", color="Risk_Tier",
+                         title="BMI Distribution Across Risk Tiers",
+                         points="all")
+        st.plotly_chart(fig_box)
+
+        # Obesity Chart by Country
+        st.subheader("Obesity Categories by Country")
+
+        def bmi_category(bmi):
+            if bmi < 25:
+                return "Normal"
+            elif bmi < 30:
+                return "Increased Risk"
+            else:
+                return "High Risk"
+
+        df["BMI_Category"] = df["BMI"].apply(bmi_category)
+
+        if "Country" in df.columns:
+            country_counts = df.groupby(["Country", "BMI_Category"]).size().reset_index(name="Count")
+
+            fig_obesity = px.bar(country_counts, x="Country", y="Count", color="BMI_Category",
+                                 barmode="group", title="Obesity Categories by Country")
+            st.plotly_chart(fig_obesity)
+        else:
+            st.warning("Dataset has no 'Country' column. Please add one to view obesity chart.")
+
+    # --- Section 2: Personal Calculator ---
+    elif section == "Personal Calculator":
+        st.header("🧮 Personal Risk Assessment Calculator")
+
+        # Input form
+        age = st.number_input("Age", min_value=1, max_value=120, value=30)
+        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+        height = st.number_input("Height (cm)", min_value=100, max_value=250, value=170)
+        weight = st.number_input("Weight (kg)", min_value=30, max_value=200, value=70)
+        waist = st.number_input("Waist Circumference (cm)", min_value=40, max_value=200, value=85)
+        glucose = st.number_input("Blood Glucose (mg/dL)", min_value=50, max_value=300, value=100)
+        hba1c = st.number_input("HbA1c (%)", min_value=3.0, max_value=15.0, value=5.5)
+
+        if st.button("Calculate Risk"):
+            bmi = weight / ((height/100) ** 2)
+
+            if hba1c >= 6.5 or glucose >= 140 or bmi >= 30:
+                tier = "High Risk"
+            elif (hba1c >= 5.7 or glucose >= 100 or bmi >= 25):
+                tier = "Moderate Risk"
+            else:
+                tier = "Low Risk"
+
+            bmi_percentile = (df["BMI"] < bmi).mean() * 100
+
+            st.success(f"Your BMI is {bmi:.2f}.")
+            st.info(f"You fall into the **{tier}** category.")
+            st.write(f"Your BMI is higher than {bmi_percentile:.1f}% of the population.")
+
+            st.subheader("Lifestyle Suggestions")
+            if tier == "High Risk":
+                st.write("- Consult a healthcare provider.")
+                st.write("- Reduce sugar intake.")
+                st.write("- Increase daily physical activity.")
+            elif tier == "Moderate Risk":
+                st.write("- Monitor vitals regularly.")
+                st.write("- Maintain consistent sleep/exercise.")
+                st.write("- Focus on portion control.")
+            else:
+                st.write("- Continue healthy habits.")
+                st.write("- Stay active.")
+                st.write("- Regular preventive checkups.")
+else:
+    st.warning("Please upload the dataset to proceed.")
