@@ -75,3 +75,15 @@ st.write("""
 - Moderate Risk group trends toward overweight and pre-diabetic ranges.
 - Low Risk group maintains healthier averages.
 """)
+
+st.subheader("BMI Risk Tier Distribution (Pie Chart)")
+fig_pie = px.pie(tier_counts, names="Risk_Tier", values="Count",
+                 title="Percentage of Population in Each Risk Tier")
+st.plotly_chart(fig_pie)
+
+st.subheader("BMI Spread by Risk Tier (Box Plot)")
+fig_box = px.box(df, x="Risk_Tier", y="BMI", color="Risk_Tier",
+                 title="BMI Distribution Across Risk Tiers",
+                 points="all")  # shows outliers
+st.plotly_chart(fig_box)
+
