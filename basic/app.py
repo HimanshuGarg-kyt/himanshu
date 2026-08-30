@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import random
 
 st.title("Interactive Metabolic Risk Dashboard & Calculator")
 
@@ -10,25 +11,40 @@ uploaded_file = st.file_uploader("Upload your dataset (CSV)", type="csv")
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
 
-    # 🎨 Page Configuration
+    # 🎨 Page setup
     st.set_page_config(page_title="Your Health, Your Journey", layout="wide")
 
-    # 🌟 Title Section
+    # 🌟 Title
     st.markdown("<h1 style='text-align:center; color:#0078D7;'>Your Health, Your Journey</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align:center; color:gray;'>Explore, Learn & Thrive!</h3>", unsafe_allow_html=True)
-
-    # 🧠 Interactive Fact Card
+    st.markdown("<h3 style='text-align:center; color:red;'>Explore, Learn & Thrive!</h3>", unsafe_allow_html=True)
     st.write("---")
-    st.subheader("💡 Did You Know?")
-    fact = st.radio(
-        "Tap to reveal a health fact:",
-        [
-            "A waist size over 40 inches for men and 35 inches for women increases metabolic risk.",
-            "Regular sleep of 7–8 hours helps maintain healthy glucose levels.",
-            "Staying hydrated improves metabolism and reduces fatigue.",
-        ],
+
+    # 🧠 Interactive Flipcards Grid
+    st.subheader("💡 Interactive Health Flipcards")
+
+    cols = st.columns(3)
+
+    with cols[0]:
+        st.markdown("### 🍎 Nutrition")
+        with st.expander("Tap to Flip"):
+            st.info("Eating more fruits and vegetables daily lowers your risk of chronic diseases.")
+
+    with cols[1]:
+        st.markdown("### 🏃 Exercise")
+        with st.expander("Tap to Flip"):
+            st.info("Just 30 minutes of brisk walking can improve cardiovascular health and reduce stress.")
+
+    with cols[2]:
+        st.markdown("### 😴 Sleep")
+        with st.expander("Tap to Flip"):
+            st.info("Regular sleep of 7–8 hours improves insulin sensitivity and boosts memory.")
+
+    # ✨ Motivational Quote
+    st.write("---")
+    st.markdown(
+        "<div style='text-align:center; font-size:20px; color:#FF5733;'>💬 Small steps lead to big changes. Start today!</div>",
+        unsafe_allow_html=True,
     )
-    st.success(fact)
 
     # 🏃 Lifestyle Collage Section
     st.write("---")
@@ -48,7 +64,7 @@ if uploaded_file is not None:
     st.markdown(
         "<div style='text-align:center; font-size:20px; color:#FF5733;'>"
         "💬 Small steps lead to big changes. Start today!"
-        "</div>",
+        "</div>",unsafe_allow_html=True
     )
     #Preprocessing ---
     for col in ["Height_cm", "Weight_kg", "Blood_Glucose", "HbA1c"]:
