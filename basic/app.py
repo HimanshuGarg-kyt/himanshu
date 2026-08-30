@@ -10,7 +10,47 @@ uploaded_file = st.file_uploader("Upload your dataset (CSV)", type="csv")
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
 
-    # --- Data Preprocessing ---
+    # 🎨 Page Configuration
+    st.set_page_config(page_title="Your Health, Your Journey", layout="wide")
+
+    # 🌟 Title Section
+    st.markdown("<h1 style='text-align:center; color:#0078D7;'>Your Health, Your Journey</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align:center; color:gray;'>Explore, Learn & Thrive!</h3>", unsafe_allow_html=True)
+
+    # 🧠 Interactive Fact Card
+    st.write("---")
+    st.subheader("💡 Did You Know?")
+    fact = st.radio(
+        "Tap to reveal a health fact:",
+        [
+            "A waist size over 40 inches for men and 35 inches for women increases metabolic risk.",
+            "Regular sleep of 7–8 hours helps maintain healthy glucose levels.",
+            "Staying hydrated improves metabolism and reduces fatigue.",
+        ],
+    )
+    st.success(fact)
+
+    # 🏃 Lifestyle Collage Section
+    st.write("---")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.image("https://cdn-icons-png.flaticon.com/512/1046/1046784.png", width=100)
+        st.caption("🍎 Healthy Eating")
+    with col2:
+        st.image("https://cdn-icons-png.flaticon.com/512/1046/1046786.png", width=100)
+        st.caption("🏃 Active Living")
+    with col3:
+        st.image("https://cdn-icons-png.flaticon.com/512/1046/1046792.png", width=100)
+        st.caption("😴 Rest & Recovery")
+
+    # ✨ Motivational Quote
+    st.write("---")
+    st.markdown(
+        "<div style='text-align:center; font-size:20px; color:#FF5733;'>"
+        "💬 Small steps lead to big changes. Start today!"
+        "</div>",
+    )
+    #Preprocessing ---
     for col in ["Height_cm", "Weight_kg", "Blood_Glucose", "HbA1c"]:
         df[col] = df[col].fillna(df[col].median())
 

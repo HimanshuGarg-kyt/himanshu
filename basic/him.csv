@@ -1,0 +1,32 @@
+Patient_ID,Age,Gender,Country,Height_cm,Weight_kg,BMI,Waist_Circumference,Blood_Glucose,HbA1c
+1,34,Male,Mexico,172,78,26.4,92,110,5.8
+2,45,Female,India,160,70,27.3,88,125,6.2
+3,29,Male,Germany,180,85,26.2,95,105,5.6
+4,52,Female,Australia,165,72,26.4,90,140,6.8
+5,61,Male,USA,175,95,31.0,105,160,7.2
+6,23,Female,Bangladesh,158,55,22.0,78,95,5.1
+7,39,Male,France,170,80,27.7,94,130,6.4
+8,47,Female,Argentina,168,76,26.9,92,145,6.9
+9,31,Male,Turkey,182,88,26.6,97,115,5.9
+10,55,Female,Malaysia,162,68,25.9,89,135,6.5
+11,28,Male,Indonesia,174,72,23.8,85,100,5.4
+12,42,Female,Saudi Arabia,166,74,26.9,91,120,6.1
+13,36,Male,UK,178,82,25.9,93,110,5.7
+14,50,Female,Canada,164,70,26.0,88,140,6.7
+15,60,Male,Italy,176,90,29.0,102,155,7.0
+16,22,Female,Japan,159,54,21.4,77,92,5.0
+17,33,Male,Spain,181,84,25.6,96,108,5.6
+18,48,Female,South Africa,167,75,26.9,90,138,6.6
+19,41,Male,Brazil,173,79,26.4,92,125,6.2
+20,53,Female,China,161,69,26.6,87,142,6.8
+21,27,Male,USA,177,80,25.5,90,105,5.5
+22,46,Female,India,162,72,27.4,89,130,6.3
+23,38,Male,Germany,180,86,26.5,95,118,6.0
+24,51,Female,Australia,164,71,26.4,88,145,6.9
+25,59,Male,Mexico,175,92,30.0,103,150,7.1
+26,25,Female,Bangladesh,158,56,22.4,79,98,5.2
+27,40,Male,France,171,82,28.0,95,132,6.5
+28,49,Female,Argentina,167,74,26.5,91,140,6.7
+29,32,Male,Turkey,182,87,26.3,96,112,5.8
+30,56,Female,Malaysia,163,69,26.0,89,138,6.6
+31,44,Female,USA,165,73,26.8,91,128,6.3
