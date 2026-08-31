@@ -1,43 +1,61 @@
-import pandas as pd
 import streamlit as st
-import plotly.express as px
-import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import pycountry
 
-st.title("Interactive Metabolic Risk Dashboard & Calculator")
-
-# --- File Upload ---
-uploaded_file = st.file_uploader("Upload your dataset (CSV)", type="csv")
-
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-
-    # 🎨 Page setup
-    st.set_page_config(page_title="Your Health, Your Journey", layout="wide")
-
-    # 🌟 Title
-    st.markdown("<h1 style='text-align:center; color:#0078D7;'>Your Health, Your Journey</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align:center; color:red;'>Explore, Learn & Thrive!</h3>", unsafe_allow_html=True)
-    st.write("---")
-
-    # 🧠 Interactive Flipcards Grid
-    st.subheader("💡 Interactive Health Flipcards")
+def main():
+    st.title("Interactive Matabolic Risk Dashboard And Calculator")
+    st.subheader("YOUR HEALTH, YOUR JOURNEY")
+    st.markdown("""
+    <style>
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+    .card:hover {
+      background-color: #f0f8ff;
+    }
+    .hidden {
+      display: none;
+    }
+    .card:hover .hidden {
+      display: block;
+      margin-top: 10px;
+      color: #333;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
     cols = st.columns(3)
 
     with cols[0]:
-        st.markdown("### 🍎 Nutrition")
-        with st.expander("Tap to Flip"):
-            st.info("Eating more fruits and vegetables daily lowers your risk of chronic diseases.")
+        st.markdown("""
+        <div class="card">
+            <h3>🍎 Nutrition</h3>
+           <div class="hidden">Eating more fruits and vegetables daily lowers your risk of chronic diseases.</div>
+       </div>
+        """, unsafe_allow_html=True)
 
     with cols[1]:
-        st.markdown("### 🏃 Exercise")
-        with st.expander("Tap to Flip"):
-            st.info("Just 30 minutes of brisk walking can improve cardiovascular health and reduce stress.")
+        st.markdown("""
+        <div class="card">
+            <h3>🏃 Exercise</h3>
+            <div class="hidden">Just 30 minutes of brisk walking can improve cardiovascular health and reduce stress.</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with cols[2]:
-        st.markdown("### 😴 Sleep")
-        with st.expander("Tap to Flip"):
-            st.info("Regular sleep of 7–8 hours improves insulin sensitivity and boosts memory.")
+        st.markdown("""
+        <div class="card">
+            <h3>😴 Sleep</h3>
+            <div class="hidden">Regular sleep of 7 to 8 hours improves insulin sensitivity and boosts memory.</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     # ✨ Motivational Quote
     st.write("---")
@@ -50,160 +68,176 @@ if uploaded_file is not None:
     st.write("---")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image("https://cdn-icons-png.flaticon.com/512/1046/1046784.png", width=100)
+        st.image("https://images.unsplash.com/photo-1690573313202-4493a7d02e9c?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", width=120)
         st.caption("🍎 Healthy Eating")
     with col2:
-        st.image("https://cdn-icons-png.flaticon.com/512/1046/1046786.png", width=100)
+        st.image("https://images.unsplash.com/photo-1728718248311-2fdb76913d94?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", width=170)
         st.caption("🏃 Active Living")
     with col3:
-        st.image("https://cdn-icons-png.flaticon.com/512/1046/1046792.png", width=100)
+        st.image("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1220&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", width=170)
         st.caption("😴 Rest & Recovery")
 
     # ✨ Motivational Quote
     st.write("---")
-    st.markdown(
-        "<div style='text-align:center; font-size:20px; color:#FF5733;'>"
-        "💬 Small steps lead to big changes. Start today!"
-        "</div>",unsafe_allow_html=True
-    )
-    #Preprocessing ---
-    for col in ["Height_cm", "Weight_kg", "Blood_Glucose", "HbA1c"]:
-        df[col] = df[col].fillna(df[col].median())
-
-    # --- Feature Engineering ---
-    df["BMI"] = df["Weight_kg"] / ((df["Height_cm"]/100) ** 2)
-
-    # --- Risk Tier Segmentation ---
-    def assign_tier(row):
-        if row["HbA1c"] >= 6.5 or row["Blood_Glucose"] >= 140 or row["BMI"] >= 30:
-            return "High Risk"
-        elif (row["HbA1c"] >= 5.7 or row["Blood_Glucose"] >= 100 or row["BMI"] >= 25):
-            return "Moderate Risk"
+    tab1, tab2 = st.tabs(["Global Dashboard", "Personal Calculator"])
+    with tab1:    
+        st.title("GLoBAL DATA")
+        doc_data = read_doc()
+        doc_data["Risk_Level"] = doc_data.apply(Risk_assigner, axis=1)
+        # scatter_table(doc_data)
+        avg = avg_age_calculator(doc_data)
+        # bar_chart(avg)
+        # box_table(doc_data)
+        # pi_chart(doc_data)
+        col1, col2 = st.columns(2)
+        with col1:
+            box_table(doc_data)
+        with col2:
+            bar_chart(avg)    
+        col1, col2 = st.columns(2)
+        with col1:
+            hexbin_plot(doc_data)
+        with col2:
+            pi_chart(doc_data)
+    with tab2:
+        st.title("PERSONAL METABOLIC CHECK")
+        data = Input_Handler()
+        if data:
+            risk = Risk_Calculator(data)
+            st.write(f"your metabolic risk is {risk}")
+            percentile = bmi_percentile(doc_data, data["BMI"])
+            if percentile is not None:
+                st.write(f"📊 Your BMI is higher than {percentile:.1f}% of the population")
+            if risk == "High":
+                st.warning("⚠️ Consult a healthcare provider. Focus on diet and exercise.")
+            elif risk == "Moderate":
+                st.info("💡 Increase physical activity and monitor glucose regularly.")
+            else:
+                st.success("✅ Maintain your current lifestyle and keep monitoring.")
+                write_doc(data)
         else:
-            return "Low Risk"
+            st.info("Fill the form and click Submit")
 
-    df["Risk_Tier"] = df.apply(assign_tier, axis=1)
+def read_doc():
+    try:
+        df = pd.read_csv("him.csv")
+        return df
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
 
-    # --- Tables ---
-    tier_counts = df["Risk_Tier"].value_counts().reset_index()
-    tier_counts.columns = ["Risk_Tier", "Count"]
+def avg_age_calculator(data):
+    avg_age = data.groupby("Risk_Level")["Age"].mean().to_dict()
+    return avg_age
 
-    avg_age = df.groupby("Risk_Tier")["Age"].mean().reset_index()
-    avg_age.columns = ["Risk_Tier", "Average_Age"]
+def bmi_percentile(data, bmi):
+    try:
+        return (data["BMI"] < bmi).mean() * 100
+    except Exception:
+        return None
 
-    # --- Sidebar Navigation ---
-    section = st.sidebar.radio("Choose Section", ["Global Dashboard", "Personal Calculator"])
+def write_doc(data):
+    new_data = {
+        "Patient_ID": data["Patient_ID"],
+        "Age": data["Age"],
+        "Gender": data["Gender"],
+        "Country": data["Country"],
+        "Height_cm": data["Height_cm"],
+        "Weight_kg": data["Weight_kg"],
+        "BMI": data["BMI"],
+        "Waist_Circumference_cm": data["Waist_Circumference_cm"],
+        "Blood_Glucose": data["Blood_Glucose"],
+        "HbA1c": data["HbA1c"]
+    }
+    df = read_doc()
+    df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
+    df.to_csv("_2.csv", index=False)
+    return df
 
-    # --- Section 1: Global Dashboard ---
-    if section == "Global Dashboard":
-        st.header("📊 Global Population Dashboard")
+def Input_Handler():
+    Patient_ID = st.number_input("Enter your userid")
+    Age = st.slider("Enter your age", min_value=1, max_value=120, value=5)
+    Gender = st.selectbox(
+    "Select your gender",
+    ["Male", "Female", "Other"]
+)
+    countries = [c.name for c in pycountry.countries]
+    Country = st.selectbox("Select your country", countries)
+    Height_cm = st.slider("Enter your height in cm", min_value=0, max_value=300, value=170)
+    Weight_kg = st.slider("Enter your weight in kg", min_value=0, max_value=500, value=50)
+    bmi = (Weight_kg*100) / (Height_cm * Height_cm)
+    Waist_Circumference_cm = st.slider("Enter your waist size", min_value=0, max_value=150, value=103)
+    Blood_Glucose = st.slider("Enter your Blood Glucose (mg/dL)", min_value=50, max_value=300, value=60)
+    HbA1c = st.slider("Enter your HbA1c (%)", min_value=4.0, max_value=15.0, value=5.0)
+    if st.button("Submit"):
+        return {
+            "Patient_ID": Patient_ID,
+            "Age": Age,
+            "Gender": Gender,
+            "Country": Country,
+            "Height_cm": Height_cm,
+            "Weight_kg": Weight_kg,
+            "BMI": bmi,
+            "Waist_Circumference_cm": Waist_Circumference_cm,
+            "Blood_Glucose": Blood_Glucose,
+            "HbA1c": HbA1c
+        }
+    else:
+        return None
 
-        # Tier Distribution
-        st.subheader("Tier Distribution Table")
-        st.table(tier_counts)
+def Risk_assigner(row):
+    if row["HbA1c"] >= 6.5 or row["Blood_Glucose"] >= 140 or row["BMI"] >= 30:
+        return "High Risk"
+    elif row["HbA1c"] >= 5.7 or row["Blood_Glucose"] >= 100 or row["BMI"] >= 25:
+        return "Moderate Risk"
+    else:
+        return "Low Risk"
 
-        st.subheader("Tier Distribution Chart")
-        fig1 = px.bar(tier_counts, x="Risk_Tier", y="Count", color="Risk_Tier",
-                      title="Tier Distribution")
-        st.plotly_chart(fig1)
+def Risk_Calculator(data):
+    bmi = data["BMI"]
+    glucose = data["Blood_Glucose"]
+    hba1c = data["HbA1c"]
+    if bmi >= 30 or glucose >= 140 or hba1c >= 6.5:
+         return "High"
+    elif bmi >= 25 or glucose >= 120 or hba1c >= 5.7:
+        return "Moderate"
+    else:
+        return "Low"
+    
 
-        # Average Age
-        st.subheader("Average Age per Tier")
-        st.table(avg_age)
+def hexbin_plot(data):
+    fig, ax = plt.subplots(figsize=(6,4))
+    ax.hexbin(data["BMI"], data["Blood_Glucose"], gridsize=40, cmap="Set1")
+    ax.set_title("BMI vs Blood Glucose (Hexbin)")
+    ax.set_xlabel("BMI")
+    ax.set_ylabel("Blood Glucose")
+    st.pyplot(fig)
 
-        fig2 = px.bar(avg_age, x="Risk_Tier", y="Average_Age", color="Risk_Tier",
-                      title="Average Age per Tier")
-        st.plotly_chart(fig2)
+def pi_chart(data):
+    sizes = data["Risk_Level"].value_counts()
+    labels = sizes.index
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90)
+    ax.set_title("Risk Level Distribution")
+    st.pyplot(fig)
 
-        # Blood Glucose Distribution
-        st.subheader("Blood Glucose Distribution by Tier")
-        fig3 = px.box(df, x="Risk_Tier", y="Blood_Glucose", color="Risk_Tier",
-                      title="Blood Glucose Distribution")
-        st.plotly_chart(fig3)
+def bar_chart(data):
+    fig, ax = plt.subplots()
+    Labels = list(data.keys())
+    values = list(data.values())
+    sns.barplot(x=Labels, y=values, hue=Labels, palette="Set1", legend=False, ax=ax)
+    ax.set_title("Average Age per Risk Level")
+    ax.set_xlabel("Risk Level")
+    ax.set_ylabel("Average Age")
+    st.pyplot(fig)
 
-        # BMI Distribution
-        st.subheader("BMI Distribution by Tier")
-        fig4 = px.box(df, x="Risk_Tier", y="BMI", color="Risk_Tier",
-                      title="BMI Distribution")
-        st.plotly_chart(fig4)
+def box_table(data):
+    fig, ax = plt.subplots()
+    sns.boxenplot(data=data, x="HbA1c", y="Risk_Level", hue="Risk_Level", palette="Set1", ax=ax)
+    ax.set_title("hbA1c vs Risk_Level")
+    ax.set_xlabel("hbA1c")
+    ax.set_ylabel("Risk_Level")
+    st.pyplot(fig)
 
-        # --- New Visualizations ---
-        # Pie Chart
-        st.subheader("BMI Risk Tier Distribution (Pie Chart)")
-        fig_pie = px.pie(tier_counts, names="Risk_Tier", values="Count",
-                         title="Percentage of Population in Each Risk Tier")
-        st.plotly_chart(fig_pie)
-
-        # Box Plot with Outliers
-        st.subheader("BMI Spread by Risk Tier (Box Plot)")
-        fig_box = px.box(df, x="Risk_Tier", y="BMI", color="Risk_Tier",
-                         title="BMI Distribution Across Risk Tiers",
-                         points="all")
-        st.plotly_chart(fig_box)
-
-        # Obesity Chart by Country
-        st.subheader("Obesity Categories by Country")
-
-        def bmi_category(bmi):
-            if bmi < 25:
-                return "Normal"
-            elif bmi < 30:
-                return "Increased Risk"
-            else:
-                return "High Risk"
-
-        df["BMI_Category"] = df["BMI"].apply(bmi_category)
-
-        if "Country" in df.columns:
-            country_counts = df.groupby(["Country", "BMI_Category"]).size().reset_index(name="Count")
-
-            fig_obesity = px.bar(country_counts, x="Country", y="Count", color="BMI_Category",
-                                 barmode="group", title="Obesity Categories by Country")
-            st.plotly_chart(fig_obesity)
-        else:
-            st.warning("Dataset has no 'Country' column. Please add one to view obesity chart.")
-
-    # --- Section 2: Personal Calculator ---
-    elif section == "Personal Calculator":
-        st.header("🧮 Personal Risk Assessment Calculator")
-
-        # Input form
-        age = st.number_input("Age", min_value=1, max_value=120, value=30)
-        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
-        height = st.number_input("Height (cm)", min_value=100, max_value=250, value=170)
-        weight = st.number_input("Weight (kg)", min_value=30, max_value=200, value=70)
-        waist = st.number_input("Waist Circumference (cm)", min_value=40, max_value=200, value=85)
-        glucose = st.number_input("Blood Glucose (mg/dL)", min_value=50, max_value=300, value=100)
-        hba1c = st.number_input("HbA1c (%)", min_value=3.0, max_value=15.0, value=5.5)
-
-        if st.button("Calculate Risk"):
-            bmi = weight / ((height/100) ** 2)
-
-            if hba1c >= 6.5 or glucose >= 140 or bmi >= 30:
-                tier = "High Risk"
-            elif (hba1c >= 5.7 or glucose >= 100 or bmi >= 25):
-                tier = "Moderate Risk"
-            else:
-                tier = "Low Risk"
-
-            bmi_percentile = (df["BMI"] < bmi).mean() * 100
-
-            st.success(f"Your BMI is {bmi:.2f}.")
-            st.info(f"You fall into the **{tier}** category.")
-            st.write(f"Your BMI is higher than {bmi_percentile:.1f}% of the population.")
-
-            st.subheader("Lifestyle Suggestions")
-            if tier == "High Risk":
-                st.write("- Consult a healthcare provider.")
-                st.write("- Reduce sugar intake.")
-                st.write("- Increase daily physical activity.")
-            elif tier == "Moderate Risk":
-                st.write("- Monitor vitals regularly.")
-                st.write("- Maintain consistent sleep/exercise.")
-                st.write("- Focus on portion control.")
-            else:
-                st.write("- Continue healthy habits.")
-                st.write("- Stay active.")
-                st.write("- Regular preventive checkups.")
-else:
-    st.warning("Please upload the dataset to proceed.")
+if __name__ == "__main__":
+    main()

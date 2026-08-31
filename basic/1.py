@@ -1,17 +1,14 @@
+def route_cost(distance, fuel_efficiency,fuel_price):
+    if( 0<distance<=100 )and fuel_efficiency>0 and fuel_price>0:
+        cost = ((distance/fuel_efficiency)*fuel_price)+5
+        return round(cost,2)
+    elif distance>100 and fuel_efficiency>0 and fuel_price>0:
+      cost=(((distance/fuel_efficiency)*fuel_price)+5)*1.10
+      return round(cost,2)
+    else:
+      return "error"
 
-tupple = (1,4,9,16,25,36,49,64,81,100)
-i = 0
-a = int(input("enter number which you want to search :"))
-
-while i<=9:
-   c = tupple[i]
-   i+=1
-   if(a==c):
-      print(c)
-      print("number found")
-      break
-else:
-   print("number not found")
-
-print("hello world")
-
+a = float(input("enter distance  : "))
+b = float(input("enter fuel efficiency : "))
+c = float(input("enter fuel price : "))
+print(route_cost(a,b,c))
