@@ -6,7 +6,7 @@ st.title("Interactive Metabolic Risk Dashboard & Calculator")
 
 def uploaded_file():
     try:
-        df = pd.read_csv("diabetes_risk_prediction_dataset-selected-columns.csv")
+        df = pd.read_csv("basic/diabetes_risk_prediction_dataset-selected-columns.csv")
         return df
     except Exception as e:
         print(f"Unexpected error: {e}")
@@ -213,4 +213,4 @@ if data is not None:
                 st.write("- Regular preventive checkups.")
 else:
     df = pd.read_csv("basic/diabetes_risk_prediction_dataset-selected-columns.csv")
-
+    
