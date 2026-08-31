@@ -212,5 +212,5 @@ if data is not None:
                 st.write("- Stay active.")
                 st.write("- Regular preventive checkups.")
 else:
-    df = pd.read_csv("basic/data.csv")
-    
+    df = pd.read_csv("basic/diabetes_risk_prediction_dataset-selected-columns.csv.csv")
+
