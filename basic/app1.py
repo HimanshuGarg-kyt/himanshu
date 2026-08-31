@@ -212,4 +212,5 @@ if data is not None:
                 st.write("- Stay active.")
                 st.write("- Regular preventive checkups.")
 else:
-    st.warning("Please upload the dataset to proceed.")
+    df = pd.read_csv("basic/data.csv")
+    
